@@ -9,12 +9,20 @@ join_data = JOIN timesheet BY (driverId), drivers BY (driverId);
 
 //filtered_errors = FILTER drivers BY (certified MATCHES 'N');
 
-grp = group join_data by timesheet::driverId;
+grp = group join_data by timesheet::driverId, drivers::name, drivers::wagePlan;
 
-drivers_events = FOREACH grp GENERATE SUM($1.timesheet::hoursLogged), SUM($1.timesheet::milesLogged), $1.drivers::driverId, $1.drivers::name, $1.drivers::wagePlan;
+drivers_events = FOREACH grp GENERATE group, SUM($1.timesheet::hoursLogged), SUM($1.timesheet::milesLogged);
+
 
 truck_events_subset = LIMIT drivers_events 100;
 
 n = DISTINCT drivers_events;
 
 dump n;
+
+store n into '/pig/data/aaa.txt' using PigStorage('|');
+
+//$1.drivers::driverId, $1.drivers::name, $1.drivers::wagePlan, 
+
+
+drivers_events: {long,long,{(drivers::driverId: int)},{(drivers::name: chararray)},{(drivers::wagePlan: chararray)}}
