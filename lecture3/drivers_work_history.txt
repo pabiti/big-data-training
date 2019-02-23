@@ -25,4 +25,3 @@ store n into '/pig/data/aaa.txt' using PigStorage('|');
 //$1.drivers::driverId, $1.drivers::name, $1.drivers::wagePlan, 
 
 
-drivers_events: {long,long,{(drivers::driverId: int)},{(drivers::name: chararray)},{(drivers::wagePlan: chararray)}}
