@@ -1,13 +1,10 @@
-timesheet = LOAD '/pig/data/timesheet.csv' USING PigStorage(',') AS
+
+timesheet = LOAD '$dir/timesheet.csv' USING PigStorage(',') AS
 (driverId:int, week:int, hoursLogged:int, milesLogged:int);
 
-drivers = LOAD '/pig/data/drivers.csv' USING PigStorage(',') AS (driverId:int, name:chararray, ssn:int, location:chararray, certified:chararray, wagePlan:chararray);
+drivers = LOAD '$dir/drivers.csv' USING PigStorage(',') AS (driverId:int, name:chararray, ssn:int, location:chararray, certified:chararray, wagePlan:chararray);
 
 join_data = JOIN timesheet BY (driverId), drivers BY (driverId);
-
-//ordered_data = ORDER drivers BY name asc;
-
-//filtered_errors = FILTER drivers BY (certified MATCHES 'N');
 
 grp = group join_data by (timesheet::driverId, drivers::name, drivers::wagePlan);
 
@@ -20,11 +17,11 @@ n = DISTINCT drivers_events;
 
 dump n;
 
-fs -rm -rf /pig/data/aaa.txt
-fs -rm -rf /pig/data/aaa
+fs -rm -r /pig/data/aaa.txt
+fs -rm -r /pig/data/aaa
 fs -mkdir /pig/data/aaa
 store n into '/pig/data/aaa' using PigStorage('|');
 
-//$1.drivers::driverId, $1.drivers::name, $1.drivers::wagePlan, 
+
 
 
