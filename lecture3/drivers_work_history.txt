@@ -1,0 +1,20 @@
+timesheet = LOAD '/pig/data/timesheet.csv' USING PigStorage(',') AS
+(driverId:int, week:int, hoursLogged:int, milesLogged:int);
+
+drivers = LOAD '/pig/data/drivers.csv' USING PigStorage(',') AS (driverId:int, name:chararray, ssn:int, location:chararray, certified:chararray, wagePlan:chararray);
+
+join_data = JOIN timesheet BY (driverId), drivers BY (driverId);
+
+//ordered_data = ORDER drivers BY name asc;
+
+//filtered_errors = FILTER drivers BY (certified MATCHES 'N');
+
+grp = group join_data by timesheet::driverId;
+
+drivers_events = FOREACH grp GENERATE SUM($1.timesheet::hoursLogged), SUM($1.timesheet::milesLogged), $1.drivers::driverId, $1.drivers::name, $1.drivers::wagePlan;
+
+truck_events_subset = LIMIT drivers_events 100;
+
+n = DISTINCT drivers_events;
+
+dump n;
